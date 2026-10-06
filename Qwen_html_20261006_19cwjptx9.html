@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المختبر الافتراضي للهندسة الكيمياوية | Virtual Chemical Engineering Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --bg-1:#0a0e27;
+  --bg-2:#1a1f4e;
+  --bg-3:#0f1535;
+  --accent-1:#00d4ff;
+  --accent-2:#7c3aed;
+  --accent-3:#f59e0b;
+  --accent-4:#10b981;
+  --accent-5:#ef4444;
+  --glass:rgba(255,255,255,0.05);
+  --glass-border:rgba(255,255,255,0.1);
+  --text-1:#ffffff;
+  --text-2:#a5b4fc;
+  --text-3:#64748b;
+  --shadow-glow:0 0 40px rgba(0,212,255,0.3);
+  --card-radius:20px;
+  --transition:all 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+[data-theme="light"]{
+  --bg-1:#f0f4ff;
+  --bg-2:#e0e7ff;
+  --bg-3:#ffffff;
+  --glass:rgba(255,255,255,0.7);
+  --glass-border:rgba(0,0,0,0.08);
+  --text-1:#1e293b;
+  --text-2:#475569;
+  --text-3:#64748b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Cairo','Tajawal',sans-serif;
+  background:var(--bg-1);
+  color:var(--text-1);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+  transition:var(--transition);
+}
+/* Animated Background */
+.bg-animation{
+  position:fixed;inset:0;z-index:-2;
+  background:linear-gradient(135deg,var(--bg-1) 0%,var(--bg-2) 50%,var(--bg-3) 100%);
+}
+.bg-animation::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 20% 30%,rgba(0,212,255,0.15) 0%,transparent 50%),
+    radial-gradient(circle at 80% 70%,rgba(124,58,237,0.15) 0%,transparent 50%),
+    radial-gradient(circle at 50% 50%,rgba(245,158,11,0.08) 0%,transparent 50%);
+  animation:bgShift 20s ease-in-out infinite;
+}
+@keyframes bgShift{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  50%{transform:scale(1.1) rotate(5deg)}
+}
+/* Floating Particles */
+.particles{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.particle{
+  position:absolute;border-radius:50%;
+  background:radial-gradient(circle,var(--accent-1),transparent);
+  opacity:0.3;animation:float linear infinite;
+}
+@keyframes float{
+  0%{transform:translateY(100vh) translateX(0) scale(0)}
+  50%{opacity:0.6}
+  100%{transform:translateY(-100vh) translateX(100px) scale(1);opacity:0}
+}
+/* Grid Pattern */
+.grid-pattern{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+  background-size:50px 50px;
+  mask-image:radial-gradient(ellipse at center,black 30%,transparent 70%);
+}
+/* Header */
+header{
+  position:sticky;top:0;z-index:100;
+  backdrop-filter:blur(20px);
+  background:var(--glass);
+  border-bottom:1px solid var(--glass-border);
+  padding:15px 0;
+  transition:var(--transition);
+}
+.nav-container{
+  max-width:1400px;margin:0 auto;padding:0 30px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;
+}
+.logo{
+  display:flex;align-items:center;gap:15px;
+  font-family:'Orbitron',sans-serif;
+  font-weight:900;font-size:1.3rem;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  cursor:pointer;
+}
+.logo-icon{
+  width:50px;height:50px;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;color:white;
+  box-shadow:var(--shadow-glow);
+  animation:pulse 3s ease-in-out infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 20px rgba(0,212,255,0.4)}
+  50%{box-shadow:0 0 40px rgba(124,58,237,0.6)}
+}
+.nav-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.nav-btn{
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  color:var(--text-1);
+  padding:10px 18px;border-radius:12px;
+  cursor:pointer;font-family:inherit;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+  transition:var(--transition);
+  font-size:0.9rem;
+}
+.nav-btn:hover{
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-glow);
+}
+.lang-toggle{
+  background:linear-gradient(135deg,var(--accent-3),var(--accent-5));
+  color:white;border:none;
+}
+/* Hero Section */
+.hero{
+  max-width:1400px;margin:0 auto;padding:60px 30px 40px;
+  text-align:center;position:relative;
+}
+.hero h1{
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:900;line-height:1.3;
+  margin-bottom:20px;
+  background:linear-gradient(135deg,var(--text-1) 0%,var(--accent-1) 50%,var(--accent-2) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  animation:titleGlow 4s ease-in-out infinite;
+}
+@keyframes titleGlow{
+  0%,100%{filter:drop-shadow(0 0 10px rgba(0,212,255,0.3))}
+  50%{filter:drop-shadow(0 0 25px rgba(124,58,237,0.5))}
+}
+.hero p{
+  font-size:1.15rem;color:var(--text-2);
+  max-width:800px;margin:0 auto 30px;line-height:1.8;
+}
+.hero-stats{
+  display:flex;justify-content:center;gap:30px;flex-wrap:wrap;
+  margin-top:40px;
+}
+.stat-card{
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  padding:20px 30px;border-radius:16px;
+  min-width:150px;
+  transition:var(--transition);
+}
+.stat-card:hover{
+  transform:translateY(-5px);
+  border-color:var(--accent-1);
+  box-shadow:var(--shadow-glow);
+}
+.stat-number{
+  font-family:'Orbitron',sans-serif;
+  font-size:2.2rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-3));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.stat-label{color:var(--text-2);font-size:0.9rem;margin-top:5px}
+/* Search & Filter */
+.controls-section{
+  max-width:1400px;margin:0 auto;padding:20px 30px;
+  display:flex;gap:15px;flex-wrap:wrap;align-items:center;justify-content:center;
+}
+.search-box{
+  flex:1;min-width:280px;max-width:500px;
+  position:relative;
+}
+.search-box input{
+  width:100%;padding:15px 50px 15px 20px;
+  background:var(--glass);
+  backdrop-filter:blur(10px);
+  border:1px solid var(--glass-border);
+  border-radius:14px;color:var(--text-1);
+  font-family:inherit;font-size:1rem;
+  transition:var(--transition);
+}
+.search-box input:focus{
+  outline:none;border-color:var(--accent-1);
+  box-shadow:0 0 0 4px rgba(0,212,255,0.15);
+}
+.search-box i{
+  position:absolute;left:20px;top:50%;transform:translateY(-50%);
+  color:var(--accent-1);font-size:1.1rem;
+}
+[dir="rtl"] .search-box i{left:auto;right:20px}
+[dir="rtl"] .search-box input{padding:15px 20px 15px 50px}
+.filter-chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.chip{
+  padding:10px 20px;border-radius:30px;
+  background:var(--glass);
+  border:1px solid var(--glass-border);
+  color:var(--text-1);cursor:pointer;
+  font-family:inherit;font-weight:600;font-size:0.9rem;
+  transition:var(--transition);
+  display:flex;align-items:center;gap:8px;
+}
+.chip:hover{transform:translateY(-2px);border-color:var(--accent-1)}
+.chip.active{
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  border-color:transparent;color:white;
+  box-shadow:var(--shadow-glow);
+}
+.chip .count{
+  background:rgba(255,255,255,0.2);
+  padding:2px 8px;border-radius:10px;font-size:0.75rem;
+}
+/* Categories */
+.category-section{
+  max-width:1400px;margin:0 auto;padding:40px 30px;
+}
+.category-header{
+  display:flex;align-items:center;gap:15px;margin-bottom:30px;
+  padding-bottom:15px;border-bottom:2px solid var(--glass-border);
+  position:relative;
+}
+.category-header::after{
+  content:'';position:absolute;bottom:-2px;right:0;
+  width:100px;height:2px;
+  background:linear-gradient(90deg,var(--accent-1),var(--accent-2));
+}
+[dir="ltr"] .category-header::after{right:auto;left:0}
+.category-icon{
+  width:60px;height:60px;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;color:white;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
+.category-icon.reactor{background:linear-gradient(135deg,#ef4444,#f59e0b)}
+.category-icon.transfer{background:linear-gradient(135deg,#00d4ff,#7c3aed)}
+.category-icon.phenomena{background:linear-gradient(135deg,#10b981,#06b6d4)}
+.category-icon.control{background:linear-gradient(135deg,#8b5cf6,#ec4899)}
+.category-title{
+  font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,var(--text-1),var(--accent-1));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.category-subtitle{color:var(--text-2);font-size:0.95rem;margin-top:5px}
+/* Cards Grid */
+.cards-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:25px;
+}
+.sim-card{
+  background:var(--glass);
+  backdrop-filter:blur(15px);
+  border:1px solid var(--glass-border);
+  border-radius:var(--card-radius);
+  padding:25px;
+  cursor:pointer;
+  transition:var(--transition);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;
+  min-height:220px;
+}
+.sim-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 0%,rgba(0,212,255,0.05) 100%);
+  opacity:0;transition:var(--transition);
+}
+.sim-card::after{
+  content:'';position:absolute;top:-50%;right:-50%;
+  width:200%;height:200%;
+  background:radial-gradient(circle,rgba(0,212,255,0.15) 0%,transparent 50%);
+  opacity:0;transition:opacity 0.6s;
+  pointer-events:none;
+}
+.sim-card:hover{
+  transform:translateY(-8px);
+  border-color:var(--accent-1);
+  box-shadow:0 20px 60px rgba(0,212,255,0.2);
+}
+.sim-card:hover::before{opacity:1}
+.sim-card:hover::after{opacity:1}
+.card-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:15px;gap:10px;
+}
+.card-icon{
+  width:50px;height:50px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;color:white;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  box-shadow:0 8px 20px rgba(0,212,255,0.3);
+}
+.card-badge{
+  padding:4px 10px;border-radius:8px;
+  font-size:0.7rem;font-weight:700;
+  background:rgba(0,212,255,0.15);
+  color:var(--accent-1);
+  border:1px solid rgba(0,212,255,0.3);
+}
+.card-title-ar{
+  font-size:1.2rem;font-weight:800;margin-bottom:5px;
+  color:var(--text-1);
+}
+.card-title-en{
+  font-size:0.85rem;color:var(--text-2);
+  font-style:italic;margin-bottom:12px;
+  font-family:'Tajawal',sans-serif;
+}
+.card-desc{
+  color:var(--text-2);font-size:0.9rem;line-height:1.7;
+  flex:1;margin-bottom:15px;
+}
+.card-action{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:15px;border-top:1px solid var(--glass-border);
+}
+.card-action-text{
+  color:var(--accent-1);font-weight:700;font-size:0.9rem;
+  display:flex;align-items:center;gap:8px;
+  transition:var(--transition);
+}
+.sim-card:hover .card-action-text{gap:12px}
+.card-action i{transition:var(--transition)}
+.sim-card:hover .card-action i{transform:translateX(-5px)}
+[dir="ltr"] .sim-card:hover .card-action i{transform:translateX(5px)}
+/* Footer */
+footer{
+  margin-top:80px;padding:40px 30px 30px;
+  background:var(--glass);
+  backdrop-filter:blur(20px);
+  border-top:1px solid var(--glass-border);
+  text-align:center;
+}
+.footer-content{max-width:1400px;margin:0 auto}
+.footer-brand{
+  font-family:'Orbitron',sans-serif;
+  font-size:1.5rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-3));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  margin-bottom:15px;
+}
+.footer-credit{
+  color:var(--text-2);font-size:0.95rem;margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+}
+.footer-credit strong{
+  color:var(--accent-1);font-weight:800;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-3));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.footer-note{
+  color:var(--text-3);font-size:0.85rem;margin-top:15px;
+  max-width:600px;margin-left:auto;margin-right:auto;line-height:1.7;
+}
+.footer-social{
+  display:flex;justify-content:center;gap:15px;margin-top:20px;
+}
+.social-icon{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--glass);border:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text-1);cursor:pointer;
+  transition:var(--transition);
+}
+.social-icon:hover{
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  transform:translateY(-3px) rotate(360deg);
+  box-shadow:var(--shadow-glow);
+}
+/* Audio Player */
+.audio-player{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--glass);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);
+  border-radius:50px;padding:10px 20px;
+  display:none;align-items:center;gap:15px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.3);
+  z-index:99;
+}
+.audio-player.active{display:flex;animation:slideUp 0.4s ease}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(100px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.audio-btn{
+  width:40px;height:40px;border-radius:50%;border:none;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  color:white;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--transition);
+}
+.audio-btn:hover{transform:scale(1.1);box-shadow:var(--shadow-glow)}
+.audio-text{color:var(--text-1);font-size:0.9rem;font-weight:600}
+/* Scroll to top */
+.scroll-top{
+  position:fixed;bottom:20px;right:20px;
+  width:50px;height:50px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent-1),var(--accent-2));
+  color:white;border:none;cursor:pointer;
+  display:none;align-items:center;justify-content:center;
+  font-size:1.2rem;z-index:98;
+  box-shadow:var(--shadow-glow);
+  transition:var(--transition);
+}
+.scroll-top.visible{display:flex;animation:slideUp 0.4s ease}
+.scroll-top:hover{transform:translateY(-5px) scale(1.1)}
+/* Loading */
+.loader{
+  position:fixed;inset:0;background:var(--bg-1);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;transition:opacity 0.5s;
+}
+.loader.hidden{opacity:0;pointer-events:none}
+.loader-spinner{
+  width:80px;height:80px;border-radius:50%;
+  border:4px solid var(--glass-border);
+  border-top-color:var(--accent-1);
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Responsive */
+@media(max-width:768px){
+  .hero h1{font-size:2rem}
+  .cards-grid{grid-template-columns:1fr}
+  .nav-container{justify-content:center}
+  .category-title{font-size:1.4rem}
+}
+/* Card appear animation */
+.sim-card{
+  opacity:0;transform:translateY(30px);
+  animation:cardAppear 0.6s ease forwards;
+}
+@keyframes cardAppear{to{opacity:1;transform:translateY(0)}}
+.sim-card:nth-child(1){animation-delay:0.05s}
+.sim-card:nth-child(2){animation-delay:0.1s}
+.sim-card:nth-child(3){animation-delay:0.15s}
+.sim-card:nth-child(4){animation-delay:0.2s}
+.sim-card:nth-child(5){animation-delay:0.25s}
+.sim-card:nth-child(6){animation-delay:0.3s}
+.sim-card:nth-child(7){animation-delay:0.35s}
+.sim-card:nth-child(8){animation-delay:0.4s}
+/* Selection */
+::selection{background:var(--accent-1);color:white}
+/* Scrollbar */
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--bg-1)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(var(--accent-1),var(--accent-2));
+  border-radius:10px;
+}
+</style>
+</head>
+<body>
+
+<!-- Loader -->
+<div class="loader" id="loader"><div class="loader-spinner"></div></div>
+
+<!-- Background -->
+<div class="bg-animation"></div>
+<div class="grid-pattern"></div>
+<div class="particles" id="particles"></div>
+
+<!-- Header -->
+<header>
+  <div class="nav-container">
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <div class="logo-icon"><i class="fas fa-flask"></i></div>
+      <div>
+        <div data-ar="المختبر الافتراضي" data-en="Virtual Lab">المختبر الافتراضي</div>
+        <div style="font-size:0.7rem;color:var(--text-2);font-weight:400" data-ar="للهندسة الكيمياوية" data-en="Chemical Engineering">للهندسة الكيمياوية</div>
+      </div>
+    </div>
+    <div class="nav-controls">
+      <button class="nav-btn" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+        <span data-ar="الوضع" data-en="Theme">الوضع</span>
+      </button>
+      <button class="nav-btn" onclick="toggleVoice()">
+        <i class="fas fa-volume-high" id="voiceIcon"></i>
+        <span data-ar="الصوت" data-en="Voice">الصوت</span>
+      </button>
+      <button class="nav-btn lang-toggle" onclick="toggleLang()">
+        <i class="fas fa-language"></i>
+        <span id="langText">EN</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <h1 data-ar="المختبر الافتراضي للهندسة الكيمياوية" data-en="Virtual Chemical Engineering Laboratory">المختبر الافتراضي للهندسة الكيمياوية</h1>
+  <p data-ar="واحد وثلاثون محاكياً تفاعلياً ثلاثي الأبعاد لمقرري تصميم المفاعلات وانتقال الكتلة. استكشف، تعلّم، وجرّب في بيئة افتراضية متقدمة." data-en="Thirty-one interactive 3D simulators for Reactor Design and Mass Transfer courses. Explore, learn, and experiment in an advanced virtual environment.">واحد وثلاثون محاكياً تفاعلياً ثلاثي الأبعاد لمقرري تصميم المفاعلات وانتقال الكتلة. استكشف، تعلّم، وجرّب في بيئة افتراضية متقدمة.</p>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-number" id="stat1">31</div>
+      <div class="stat-label" data-ar="محاكي تفاعلي" data-en="Interactive Simulators">محاكي تفاعلي</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">4</div>
+      <div class="stat-label" data-ar="أقسام علمية" data-en="Scientific Sections">أقسام علمية</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">3D</div>
+      <div class="stat-label" data-ar="محاكاة ثلاثية الأبعاد" data-en="3D Simulation">محاكاة ثلاثية الأبعاد</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label" data-ar="متاح دائماً" data-en="Always Available">متاح دائماً</div>
+    </div>
+  </div>
+</section>
+
+<!-- Controls -->
+<section class="controls-section">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="ابحث عن محاكي..." data-ar-placeholder="ابحث عن محاكي..." data-en-placeholder="Search simulator...">
+    <i class="fas fa-search"></i>
+  </div>
+  <div class="filter-chips" id="filterChips">
+    <button class="chip active" data-filter="all">
+      <i class="fas fa-th"></i>
+      <span data-ar="الكل" data-en="All">الكل</span>
+      <span class="count">31</span>
+    </button>
+    <button class="chip" data-filter="reactor">
+      <i class="fas fa-atom"></i>
+      <span data-ar="المفاعلات" data-en="Reactors">المفاعلات</span>
+      <span class="count">7</span>
+    </button>
+    <button class="chip" data-filter="transfer">
+      <i class="fas fa-fire-flame-curved"></i>
+      <span data-ar="انتقال الكتلة والحرارة" data-en="Mass & Heat">انتقال الكتلة والحرارة</span>
+      <span class="count">10</span>
+    </button>
+    <button class="chip" data-filter="phenomena">
+      <i class="fas fa-wave-square"></i>
+      <span data-ar="ظواهر الانتقال" data-en="Phenomena">ظواهر الانتقال</span>
+      <span class="count">7</span>
+    </button>
+    <button class="chip" data-filter="control">
+      <i class="fas fa-sliders"></i>
+      <span data-ar="السيطرة" data-en="Control">السيطرة</span>
+      <span class="count">7</span>
+    </button>
+  </div>
+</section>
+
+<!-- Categories Container -->
+<main id="categoriesContainer"></main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-brand">VIRTUAL CHEM LAB</div>
+    <div class="footer-credit">
+      <i class="fas fa-copyright"></i>
+      <span data-ar="جميع الحقوق محفوظة" data-en="All Rights Reserved">جميع الحقوق محفوظة</span>
+      <span>2026</span>
+      <span>|</span>
+      <strong>ENG. ALAA MOHAMMED</strong>
+    </div>
+    <div class="footer-credit" style="font-size:0.85rem">
+      <i class="fas fa-university"></i>
+      <span data-ar="قسم الهندسة الكيمياوية والصناعات النفطية - كلية العمارة الجامعة" data-en="Chemical Engineering & Petroleum Industries Dept. - Al-Amara University College">قسم الهندسة الكيمياوية والصناعات النفطية - كلية العمارة الجامعة</span>
+    </div>
+    <div class="footer-note" data-ar="كل محاكٍ يعمل في المتصفح باللغتين العربية والإنكليزية، ويحتاج اتصالاً بالإنترنت عند أول تحميل. يُفضَّل استخدام Edge أو Chrome لسماع الشرح الصوتي." data-en="Each simulator runs in the browser in both Arabic and English, and requires internet connection on first load. Edge or Chrome is recommended for audio narration.">كل محاكٍ يعمل في المتصفح باللغتين العربية والإنكليزية، ويحتاج اتصالاً بالإنترنت عند أول تحميل. يُفضَّل استخدام Edge أو Chrome لسماع الشرح الصوتي.</div>
+    <div class="footer-social">
+      <a class="social-icon" title="Email"><i class="fas fa-envelope"></i></a>
+      <a class="social-icon" title="YouTube"><i class="fab fa-youtube"></i></a>
+      <a class="social-icon" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+      <a class="social-icon" title="GitHub"><i class="fab fa-github"></i></a>
+    </div>
+  </div>
+</footer>
+
+<!-- Audio Player -->
+<div class="audio-player" id="audioPlayer">
+  <button class="audio-btn" onclick="toggleAudioPlayback()">
+    <i class="fas fa-pause" id="audioIcon"></i>
+  </button>
+  <div class="audio-text" id="audioText" data-ar="جارٍ القراءة..." data-en="Reading...">جارٍ القراءة...</div>
+  <button class="audio-btn" style="background:var(--accent-5)" onclick="stopAudio()">
+    <i class="fas fa-stop"></i>
+  </button>
+</div>
+
+<!-- Scroll Top -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+// Simulators Data
+const simulators = {
+  reactor:[
+    {ar:"المفاعل الدفعي بقميص",en:"Jacketed batch reactor",url:"https://claude.ai/artifact/4QHSq5u7YDyTZuQxz56Lcv",desc_ar:"تفاعلات متتالية طاردة للحرارة A → B → C، والزمن المثالي لإيقاف الدفعة، والتحكم المتتالي، والانفلات الحراري وصمام الأمان.",desc_en:"Consecutive exothermic reactions A→B→C, optimal batch stop time, cascade control, thermal runaway and safety relief valve.",icon:"fa-flask-vial"},
+    {ar:"المفاعل الخزاني المستمر ذو الخلاط",en:"CSTR",url:"https://claude.ai/artifact/Y8vwB6SDXw7yxWp48A5x4v",desc_ar:"خلط تام، وتحويل A + B → C، مع المناطق الميتة والجريان المختصر.",desc_en:"Perfect mixing, conversion A+B→C, with dead zones and short-circuiting.",icon:"fa-circle-notch"},
+    {ar:"المفاعل الخزاني الناشر للحرارة: اتزان متعدد وسيطرة",en:"Exothermic CSTR: multiple steady states",url:"https://claude.ai/artifact/EMXwHfQFiiwQ23uHa23NTb",desc_ar:"ثلاث حالات اتزان، مخطط van Heerden والتفرع ومستوى الطور، والانفلات والتذبذب.",desc_en:"Three steady states, van Heerden diagram, bifurcation and phase plane, runaway and oscillation.",icon:"fa-temperature-high"},
+    {ar:"المفاعل الأنبوبي",en:"Plug Flow Reactor (PFR)",url:"https://claude.ai/artifact/XEZeQktr8SQqVPY1vZ8V6V",desc_ar:"تناقص التركيز على طول الأنبوب، ومقارنة بالمفاعل الخزاني، وأثر الجريان الطباقي.",desc_en:"Concentration decay along the tube, comparison with CSTR, laminar flow effect.",icon:"fa-timeline"},
+    {ar:"مفاعل الحشوة المحفزة",en:"Packed bed catalytic reactor",url:"https://claude.ai/artifact/6sTvKNfGXLQdvrp8AaTMre",desc_ar:"هبوط الضغط بمعادلة إرغن وأثره في التحويل، مع قطر الحبيبة وتدفق الغاز.",desc_en:"Pressure drop by Ergun equation and its effect on conversion, with pellet diameter and gas flow.",icon:"fa-cubes"},
+    {ar:"مفاعل الطبقة المميعة",en:"Fluidized bed reactor",url:"https://claude.ai/artifact/Xdd3En6DexPtSbRQaJtFX8",desc_ar:"من الطبقة الثابتة إلى المميعة والفقاعية والمضطربة، مع الإعصارات.",desc_en:"From fixed bed to fluidized, bubbling and turbulent, with cyclones.",icon:"fa-wind"},
+    {ar:"توزيع زمن المكوث (RTD)",en:"Residence Time Distribution",url:"https://claude.ai/artifact/MKhZ6UQvVFHVEoDCRXbsRM",desc_ar:"حقن نبضة متتبع وقياس E(t) للخزان والخزانات المتتالية والتشتت والجريان الطباقي.",desc_en:"Tracer pulse injection and E(t) measurement for tank, tanks-in-series, dispersion and plug flow.",icon:"fa-chart-line"}
+  ],
+  transfer:[
+    {ar:"برج التقطير ذو الصواني",en:"Tray distillation column",url:"https://claude.ai/artifact/M1W17t9VYrTZKVimV82mwi",desc_ar:"صواني وسدود، ونسبة الارتجاع وتركيز كل صينية، وظاهرة الغمر.",desc_en:"Trays and weirs, reflux ratio and tray composition, flooding phenomenon.",icon:"fa-layer-group"},
+    {ar:"برج الامتصاص المحشو",en:"Packed absorption column",url:"https://claude.ai/artifact/7kfLeNUHcbA3xvQG2Yyp9H",desc_ar:"أربعة أنواع حشوة، ونسبة L/G والاسترداد، مع الغمر وسوء التوزيع.",desc_en:"Four packing types, L/G ratio and recovery, with flooding and maldistribution.",icon:"fa-filter"},
+    {ar:"عمود الاستخلاص سائل–سائل",en:"Liquid–liquid extraction column",url:"https://claude.ai/artifact/9p36myjjScXkFD9Dn2MMAa",desc_ar:"عمود قرص دوّار بتيارين متعاكسين: القطرات والاحتجاز والغمر.",desc_en:"Rotary disc contactor with counter-current streams: droplets, holdup and flooding.",icon:"fa-droplet"},
+    {ar:"المجفف الدوار",en:"Rotary dryer",url:"https://claude.ai/artifact/M8wpdSMpFigYc8QwUwYGBr",desc_ar:"رفّاعات تسكب المادة ستائر عبر الغاز الساخن، مع رطوبة المنتج وحرارة الغاز.",desc_en:"Lifters cascade material through hot gas, with product moisture and gas temperature.",icon:"fa-fan"},
+    {ar:"برج التبريد",en:"Cooling tower",url:"https://claude.ai/artifact/B7EjGyTQ789qFFM97iTABu",desc_ar:"طريقة ميركل ومخطط الإنثالبي، والمدى والاقتراب، وأثر التكلس.",desc_en:"Merkel method and enthalpy diagram, range and approach, scaling effect.",icon:"fa-snowflake"},
+    {ar:"المبادل الحراري ذو الغلاف والأنابيب",en:"Shell-and-tube heat exchanger",url:"https://claude.ai/artifact/YAhcjEnKZazf9m9k4CpAzt",desc_ar:"مبادل 1–2 مع الفعالية وNTU ومعامل التصحيح F، وأثر التلوث.",desc_en:"1-2 exchanger with effectiveness, NTU and correction factor F, fouling effect.",icon:"fa-heat"},
+    {ar:"المبخر ثلاثي التأثير",en:"Triple-effect evaporator",url:"https://claude.ai/artifact/GfaAQeNBjh6NsjgGqVvFKx",desc_ar:"تغذية أمامية بمساحات متساوية، واقتصاد البخار، ومقارنة بعدد التأثيرات من 1 إلى 5.",desc_en:"Forward feed with equal areas, steam economy, comparison of 1 to 5 effects.",icon:"fa-fire"},
+    {ar:"خزان الوميض",en:"Flash drum",url:"https://claude.ai/artifact/LLtQsNGxiQp3MXThirjiUm",desc_ar:"وميض أديباتي لخليط ثلاثي: نسبة التبخر وتركيب الطورين.",desc_en:"Adiabatic flash for ternary mixture: vapor fraction and phase compositions.",icon:"fa-bolt"},
+    {ar:"المبلور التبريدي المستمر",en:"Continuous cooling crystallizer",url:"https://claude.ai/artifact/BiVgJe8AQhvBns1DmD8rWm",desc_ar:"نموذج MSMPR لنترات البوتاسيوم، والنمو والتنوّي، وتوزيع أحجام البلورات.",desc_en:"MSMPR model for potassium nitrate, growth and nucleation, crystal size distribution.",icon:"fa-gem"},
+    {ar:"وحدة التناضح العكسي (RO)",en:"Reverse osmosis unit",url:"https://claude.ai/artifact/TeUoc5bqBn7Ytynsgs8zsh",desc_ar:"عناصر حلزونية وألياف مجوفة، واستقطاب التركيز، واسترجاع الطاقة.",desc_en:"Spiral and hollow-fiber elements, concentration polarization, energy recovery.",icon:"fa-water"}
+  ],
+  phenomena:[
+    {ar:"الانتشار الجزيئي وقانون فيك",en:"Molecular diffusion and Fick's law",url:"https://claude.ai/artifact/1FDav7XfLozjXPpKQSgieP",desc_ar:"غازان يلتقيان بعد رفع الحاجز، ومنحنى التركيز يتسطح مع الزمن.",desc_en:"Two gases meet after barrier removal, concentration profile flattens with time.",icon:"fa-arrows-left-right"},
+    {ar:"الانتشار عبر غاز ساكن (أنبوب ستيفان)",en:"Diffusion through stagnant gas (Stefan tube)",url:"https://claude.ai/artifact/GYzE8F3q8DZbsiQCSWnni8",desc_ar:"تبخر سائل عبر هواء ساكن، ومقارنة بالانتشار المتعاكس المتساوي.",desc_en:"Liquid evaporation through stagnant air, comparison with equimolar counter-diffusion.",icon:"fa-vial"},
+    {ar:"نظرية الغشاءين",en:"Two-film theory",url:"https://claude.ai/artifact/GLZFRRmgAdTfjwGgAr2gsF",desc_ar:"غشاء الغاز وغشاء السائل، والمقاومة المتحكمة، ومخطط التشغيل.",desc_en:"Gas film and liquid film, controlling resistance, operating diagram.",icon:"fa-layer-group"},
+    {ar:"نظرية الاختراق وتجديد السطح",en:"Penetration and surface renewal",url:"https://claude.ai/artifact/JuQbquAC6zDZqcGv7SQFCs",desc_ar:"هيغبي ودانكويرتس مقابل نظرية الغشاء، واعتماد k_L على D.",desc_en:"Higbie and Danckwerts vs film theory, k_L dependence on D.",icon:"fa-rotate"},
+    {ar:"الانتشار والتفاعل داخل حبيبة محفز",en:"Diffusion and reaction in catalyst pellet",url:"https://claude.ai/artifact/ADoPDcn1cKqcBQkmVRpLcT",desc_ar:"مسالك متعرجة ومواقع فعالة، ومعامل ثيلي وعامل الفعالية.",desc_en:"Tortuous paths and active sites, Thiele modulus and effectiveness factor.",icon:"fa-circle-dot"},
+    {ar:"الانتشار غير المستقر في جسم صلب",en:"Unsteady diffusion in a solid",url:"https://claude.ai/artifact/SNemwbUh6gfxvXGihpaXqn",desc_ar:"لوح وأسطوانة وكرة وجسم سميك: تعمق المذاب مع الزمن.",desc_en:"Slab, cylinder, sphere and semi-infinite: solute penetration with time.",icon:"fa-cube"},
+    {ar:"طبقة التركيز الحدية",en:"Concentration boundary layer",url:"https://claude.ai/artifact/RdqPewhQgGPVHaCfqg9dvs",desc_ar:"جريان فوق لوح يذوب: نمو الطبقتين الحديتين وأعداد رينولدز وشميت وشيروود.",desc_en:"Flow over dissolving plate: boundary layers growth, Re, Sc and Sh numbers.",icon:"fa-wave-square"}
+  ],
+  control:[
+    {ar:"الخزانان المقلّبان على التوالي (التوصيلية)",en:"Two stirred tanks in series (conductivity)",url:"https://claude.ai/artifact/RrrkUb2JwWr2HN89AW2oDZ",desc_ar:"خطوة من الماء إلى محلول ملح: المعايرة، وقاعدة 63%، وطريقة كالدويل، والزمن الميت.",desc_en:"Step from water to salt solution: calibration, 63% rule, Caldwell method, dead time.",icon:"fa-bezier-curve"},
+    {ar:"مسخن الخزانين على التوالي",en:"Two stirred tank heater in series",url:"https://claude.ai/artifact/LgEMfx9C6S9ZpmwxQTD5aS",desc_ar:"خزانان مقلَّبان ومسخّن: خطوة في الطاقة، وطريقتا كالدويل ومنحنى رد فعل العملية.",desc_en:"Two stirred heated tanks: energy step, Caldwell and process reaction curve methods.",icon:"fa-temperature-arrow-up"},
+    {ar:"نظام الرتبة الثانية: مانومتر U",en:"Second-order system: U-tube manometer",url:"https://claude.ai/artifact/TbNTF7WUQnvBd1rai6Wuff",desc_ar:"زئبق يتذبذب بعد خطوة في التدفق: التجاوز ونسبة الاضمحلال والدورة.",desc_en:"Mercury oscillates after flow step: overshoot, decay ratio and period.",icon:"fa-gauge-high"},
+    {ar:"التغذية الراجعة لخزان رتبة أولى",en:"Feedback on a first-order tank",url:"https://claude.ai/artifact/Qx6vfyqzRXDV3G4gu5hqFK",desc_ar:"صمام ضاغط ومتحكم على مستوى خزان: التحكم P والإزاحة وPI، وعدم خطية الصمام.",desc_en:"Control valve and tank level controller: P, offset and PI control, valve nonlinearity.",icon:"fa-arrows-rotate"},
+    {ar:"وحدة السيطرة على الضغط PCT-M3",en:"PCT-M3 pressure control unit",url:"https://claude.ai/artifact/DVzKBRH1xUmynPY2Jc28Bh",desc_ar:"ضغط خزان هواء: ضبط P وPI وPID بخطوة أو منحدر أو موجة جيبية.",desc_en:"Air tank pressure: P, PI and PID tuning with step, ramp or sine wave.",icon:"fa-gauge"},
+    {ar:"السيطرة على الحرارة PCT-M4",en:"Temperature control PCT-M4",url:"https://claude.ai/artifact/K8KEKM9RZxcu8g99SGg2t7",desc_ar:"ساق يسخّنها عنصر بلتييه وثلاثة مجسات PRT ومروحة اضطراب.",desc_en:"Rod heated by Peltier element, three PRT sensors and disturbance fan.",icon:"fa-thermometer-half"},
+    {ar:"جهاز RT 578: أربع حلقات",en:"RT 578 trainer: four loops",url:"https://claude.ai/artifact/LsTFbhdW2m3wDrVFUmGZaT",desc_ar:"حلقة PID صناعية على جهاز تدريبي: المستوى والتدفق والضغط والحرارة.",desc_en:"Industrial PID loop on trainer: level, flow, pressure and temperature.",icon:"fa-diagram-project"}
+  ]
+};
+
+const categoryMeta = {
+  reactor:{title_ar:"تصميم المفاعلات",title_en:"Reactor Design",subtitle_ar:"محاكيات المفاعلات الكيمياوية وأنماط الجريان",subtitle_en:"Chemical reactor simulators and flow patterns",icon:"fa-atom",class:"reactor"},
+  transfer:{title_ar:"معدات انتقال الكتلة والحرارة",title_en:"Mass & Heat Transfer Equipment",subtitle_ar:"الأبراج والمبادلات ووحدات الفصل",subtitle_en:"Columns, exchangers and separation units",icon:"fa-fire-flame-curved",class:"transfer"},
+  phenomena:{title_ar:"ظواهر انتقال الكتلة",title_en:"Mass Transfer Phenomena",subtitle_ar:"الانتشار والنظريات الحركية",subtitle_en:"Diffusion and kinetic theories",icon:"fa-wave-square",class:"phenomena"},
+  control:{title_ar:"مختبر السيطرة على العمليات",title_en:"Process Control Lab",subtitle_ar:"المتحكمات والحلقات الصناعية",subtitle_en:"Controllers and industrial loops",icon:"fa-sliders",class:"control"}
+};
+
+let currentLang = 'ar';
+let currentFilter = 'all';
+let voiceEnabled = true;
+let currentUtterance = null;
+
+// Render categories
+function renderCategories(){
+  const container = document.getElementById('categoriesContainer');
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  container.innerHTML = '';
+  
+  Object.keys(simulators).forEach(catKey=>{
+    const meta = categoryMeta[catKey];
+    const sims = simulators[catKey].filter(s=>{
+      const matchesFilter = currentFilter==='all' || currentFilter===catKey;
+      const matchesSearch = !searchTerm || s.ar.toLowerCase().includes(searchTerm) || s.en.toLowerCase().includes(searchTerm) || s.desc_ar.toLowerCase().includes(searchTerm) || s.desc_en.toLowerCase().includes(searchTerm);
+      return matchesFilter && matchesSearch;
+    });
+    
+    if(sims.length===0) return;
+    
+    const section = document.createElement('section');
+    section.className = 'category-section';
+    section.innerHTML = `
+      <div class="category-header">
+        <div class="category-icon ${meta.class}"><i class="fas ${meta.icon}"></i></div>
+        <div>
+          <div class="category-title">${currentLang==='ar'?meta.title_ar:meta.title_en}</div>
+          <div class="category-subtitle">${currentLang==='ar'?meta.subtitle_ar:meta.subtitle_en}</div>
+        </div>
+      </div>
+      <div class="cards-grid">
+        ${sims.map((s,i)=>`
+          <div class="sim-card" onclick="openSimulator('${s.url}','${s.ar.replace(/'/g,"\\'")}','${s.en.replace(/'/g,"\\'")}')" style="animation-delay:${i*0.05}s">
+            <div class="card-header">
+              <div class="card-icon"><i class="fas ${s.icon}"></i></div>
+              <div class="card-badge">3D</div>
+            </div>
+            <div class="card-title-ar">${currentLang==='ar'?s.ar:s.en}</div>
+            <div class="card-title-en">${currentLang==='ar'?s.en:s.ar}</div>
+            <div class="card-desc">${currentLang==='ar'?s.desc_ar:s.desc_en}</div>
+            <div class="card-action">
+              <span class="card-action-text">
+                <span>${currentLang==='ar'?'فتح المحاكي':'Open Simulator'}</span>
+                <i class="fas fa-arrow-left"></i>
+              </span>
+              <i class="fas fa-external-link-alt" style="color:var(--text-3)"></i>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(section);
+  });
+  
+  if(container.children.length===0){
+    container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:var(--text-2)">
+      <i class="fas fa-search" style="font-size:3rem;margin-bottom:20px;opacity:0.3"></i>
+      <p style="font-size:1.1rem">${currentLang==='ar'?'لا توجد نتائج مطابقة':'No matching results'}</p>
+    </div>`;
+  }
+}
+
+function openSimulator(url,arTitle,enTitle){
+  if(voiceEnabled){
+    speak(currentLang==='ar'?`جارٍ فتح ${arTitle}`:`Opening ${enTitle}`);
+  }
+  setTimeout(()=>window.open(url,'_blank'),300);
+}
+
+// Speech
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = currentLang==='ar'?'ar-SA':'en-US';
+  utter.rate = 0.95;
+  utter.pitch = 1;
+  currentUtterance = utter;
+  document.getElementById('audioPlayer').classList.add('active');
+  window.speechSynthesis.speak(utter);
+  utter.onend = ()=>{
+    document.getElementById('audioPlayer').classList.remove('active');
+  };
+}
+function toggleAudioPlayback(){
+  if(window.speechSynthesis.paused){
+    window.speechSynthesis.resume();
+    document.getElementById('audioIcon').className='fas fa-pause';
+  } else {
+    window.speechSynthesis.pause();
+    document.getElementById('audioIcon').className='fas fa-play';
+  }
+}
+function stopAudio(){
+  window.speechSynthesis.cancel();
+  document.getElementById('audioPlayer').classList.remove('active');
+}
+
+// Theme
+function toggleTheme(){
+  const body = document.body;
+  const current = body.getAttribute('data-theme');
+  const next = current==='light'?'dark':'light';
+  body.setAttribute('data-theme',next);
+  document.getElementById('themeIcon').className = next==='light'?'fas fa-sun':'fas fa-moon';
+  localStorage.setItem('theme',next);
+}
+
+// Language
+function toggleLang(){
+  currentLang = currentLang==='ar'?'en':'ar';
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang==='ar'?'rtl':'ltr';
+  document.getElementById('langText').textContent = currentLang==='ar'?'EN':'AR';
+  
+  document.querySelectorAll('[data-ar]').forEach(el=>{
+    el.textContent = el.getAttribute(currentLang==='ar'?'data-ar':'data-en');
+  });
+  document.querySelectorAll('[data-ar-placeholder]').forEach(el=>{
+    el.placeholder = el.getAttribute(currentLang==='ar'?'data-ar-placeholder':'data-en-placeholder');
+  });
+  
+  renderCategories();
+  if(voiceEnabled){
+    speak(currentLang==='ar'?'تم التبديل إلى العربية':'Switched to English');
+  }
+  localStorage.setItem('lang',currentLang);
+}
+
+// Voice
+function toggleVoice(){
+  voiceEnabled = !voiceEnabled;
+  document.getElementById('voiceIcon').className = voiceEnabled?'fas fa-volume-high':'fas fa-volume-xmark';
+  if(!voiceEnabled) stopAudio();
+}
+
+// Filter
+document.getElementById('filterChips').addEventListener('click',e=>{
+  const chip = e.target.closest('.chip');
+  if(!chip) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  currentFilter = chip.dataset.filter;
+  renderCategories();
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input',renderCategories);
+
+// Scroll top
+window.addEventListener('scroll',()=>{
+  const btn = document.getElementById('scrollTop');
+  if(window.scrollY>400) btn.classList.add('visible');
+  else btn.classList.remove('visible');
+});
+
+// Particles
+function createParticles(){
+  const container = document.getElementById('particles');
+  for(let i=0;i<25;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random()*6+2;
+    p.style.width = size+'px';
+    p.style.height = size+'px';
+    p.style.left = Math.random()*100+'%';
+    p.style.animationDuration = (Math.random()*20+15)+'s';
+    p.style.animationDelay = Math.random()*10+'s';
+    container.appendChild(p);
+  }
+}
+
+// Loader
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').classList.add('hidden');
+  },500);
+});
+
+// Init
+(function init(){
+  const savedTheme = localStorage.getItem('theme');
+  if(savedTheme==='light'){
+    document.body.setAttribute('data-theme','light');
+    document.getElementById('themeIcon').className='fas fa-sun';
+  }
+  const savedLang = localStorage.getItem('lang');
+  if(savedLang && savedLang!==currentLang){
+    toggleLang();
+  }
+  createParticles();
+  renderCategories();
+})();
+</script>
+</body>
+</html>
